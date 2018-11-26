@@ -1,0 +1,78 @@
+service: my-saga-demo
+
+# Use the serverless-webpack plugin to transpile ES6
+plugins:
+  - serverless-webpack
+  - serverless-offline
+
+# serverless-webpack configuration
+# Enable auto-packing of external modules
+custom:
+ webpack:
+  webpackConfig: ./webpack.config.js
+  includeModules: true
+ tableName: 'orders-table-${self:provider.stage}'
+
+provider:
+ name: aws
+ runtime: nodejs8.10
+ stage: dev
+ region: ap-southeast-2
+ iamRoleStatements:
+  - Effect: Allow
+    Action:
+    - dynamodb:Query
+    - dynamodb:Scan
+    - dynamodb:GetItem
+    - dynamodb:PutItem
+    - dynamodb:UpdateItem
+    - dynamodb:DeleteItem
+    Resource:
+      - { "Fn::GetAtt": ["OrdersDynamoDBTable", "Arn" ] }
+  - Effect: Allow
+    Action:
+    - lambda:InvokeFunction
+    Resource: 'arn:aws:lambda:ap-southeast-2:181630946722:function:*'    
+ environment:
+  ORDERS_TABLE: ${self:custom.tableName}
+
+functions:
+ app:
+  handler: index.handler
+  events:
+   - http: ANY /
+   - http: 'ANY {proxy+}'
+  
+ createAnOrder:
+  handler: createOrder.main
+  events:
+    - http:
+        path: api/orders
+        method: post
+        cors: true
+        authorizer: aws_iam
+
+resources:
+ Resources:
+  OrdersDynamoDBTable:
+   Type: 'AWS::DynamoDB::Table'
+   Properties:
+    AttributeDefinitions:
+     -
+      AttributeName: "orderId"
+      AttributeType: "S"
+     -
+      AttributeName: "version"
+      AttributeType: "N"
+    KeySchema:
+     -
+      AttributeName: "orderId"
+      AttributeType: "HASH"
+     -
+      AttributeName: "version"
+      AttributeType: "RANGE"
+    ProvisionedThroughput:
+     ReadCapacityUnits: 1
+     WriteCapacityUnits: 1
+    TableName: ${self:custom.tableName}      
+    
