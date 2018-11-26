@@ -7,7 +7,7 @@ function buildRequestParameter(orderDetail) {
   return orderDetail;
 }
 
-export default async function main(event, context) {
+export async function main(event, context) {
   // Request body is passed in as a JSON encoded string in 'event.body'
   const data = JSON.parse(event.body);
 

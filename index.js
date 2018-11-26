@@ -2,7 +2,7 @@ import serverless from 'serverless-http';
 import bodyParser from 'body-parser';
 import express from 'express';
 import AWS from 'aws-sdk';
-import createOrderHandler from './createOrder';
+import { main as createOrderHandler } from './createOrder';
 
 const app = express();
 app.use(bodyParser.json({ strict: false }));

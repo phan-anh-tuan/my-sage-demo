@@ -2,8 +2,9 @@ service: my-saga-demo
 
 # Use the serverless-webpack plugin to transpile ES6
 plugins:
-  - serverless-webpack
-  - serverless-offline
+ - serverless-webpack
+ - serverless-dynamodb-local
+ - serverless-offline
 
 # serverless-webpack configuration
 # Enable auto-packing of external modules
@@ -12,6 +13,9 @@ custom:
   webpackConfig: ./webpack.config.js
   includeModules: true
  tableName: 'orders-table-${self:provider.stage}'
+ dynamodb:
+  start:
+   migrate: true
 
 provider:
  name: aws
@@ -67,10 +71,10 @@ resources:
     KeySchema:
      -
       AttributeName: "orderId"
-      AttributeType: "HASH"
+      KeyType: "HASH"
      -
       AttributeName: "version"
-      AttributeType: "RANGE"
+      KeyType: "RANGE"
     ProvisionedThroughput:
      ReadCapacityUnits: 1
      WriteCapacityUnits: 1

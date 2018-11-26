@@ -1,0 +1,16 @@
+{
+    "orderId": "ID3",
+    "items": [
+        { 
+            "itemId": "1",
+            "name": "smart watch",
+            "quantity": 1
+        },
+        {
+            "itemId": "2",
+            "name": "smart phone",
+            "quantity": 2
+        }
+    ],
+    "version": 1
+}
