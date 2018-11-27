@@ -6,7 +6,6 @@ import DuplicatedRequestException from './exception/DuplicatedRequestException';
 
 function buildRequestParameter(orderDetails) {
   return Object.assign({}, { TableName: process.env.ORDERS_TABLE }, { Item : orderDetails} , {  ConditionExpression: 'attribute_not_exists(orderId) AND attribute_not_exists(version)' } );
-  // return Object.assign({}, { TableName: process.env.ORDERS_TABLE }, Item);
 }
 
 export async function main(event, context) {
@@ -16,15 +15,15 @@ export async function main(event, context) {
   const orderDetail = {
     orderId: data.orderId,
     items: data.items,
-    version: data.version,
+    version: data.version, // this should be datetime ??
   };
   // validate input
   const { errors, value } = validate(orderDetail, 'order');
   if (errors) {
     // Throw an exception that step functions can catch then deal with it
     throw new InvalidParrameterError('Invalid Order Details'.concat(errors.toString()));
-    return;
   }
+  
   const params = buildRequestParameter(value);
   console.log('DynamoDB called with: ',params)
   try {
@@ -40,6 +39,3 @@ export async function main(event, context) {
     }
   }
 }
-
-
-  

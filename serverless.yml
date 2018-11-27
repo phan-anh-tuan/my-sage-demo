@@ -55,7 +55,14 @@ functions:
         method: post
         cors: true
         authorizer: aws_iam
-
+ deleteAnOrder:
+  handler: compensateCreateOrder.main
+  events:
+    - http:
+        path: api/orders
+        method: delete
+        cors: true
+        authorizer: aws_iam
 resources:
  Resources:
   OrdersDynamoDBTable:

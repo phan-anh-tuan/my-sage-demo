@@ -1,0 +1,6 @@
+{
+    "orderId": "ID3",
+    "version": 1,
+    "isCompensationTransaction": true,
+    "failureCause": "CustomerCreditExceeded"
+}
