@@ -12,7 +12,9 @@ custom:
  webpack:
   webpackConfig: ./webpack.config.js
   includeModules: true
- tableName: 'orders-table-${self:provider.stage}'
+ ordersTableName: 'orders-table-${self:provider.stage}'
+ processedOrderTableName: 'processed-orders-table-${self:provider.stage}'
+ inventoryTableName: 'inventory-table-${self:provider.stage}'
  dynamodb:
   start:
    migrate: true
@@ -33,13 +35,16 @@ provider:
     - dynamodb:DeleteItem
     Resource:
       - { "Fn::GetAtt": ["OrdersDynamoDBTable", "Arn" ] }
+      - { "Fn::GetAtt": ["InventoryDynamoDBTable", "Arn" ] }
+      - { "Fn::GetAtt": ["ProcessedOrdersDynamoDBTable", "Arn" ] }
   - Effect: Allow
     Action:
     - lambda:InvokeFunction
     Resource: 'arn:aws:lambda:ap-southeast-2:181630946722:function:*'    
  environment:
-  ORDERS_TABLE: ${self:custom.tableName}
-
+  ORDERS_TABLE: ${self:custom.ordersTableName}
+  PROCESSED_ORDER_TABLE: ${self:custom.processedOrderTableName}
+  INVENTORY_TABLE: ${self:custom.inventoryTableName}
 functions:
  app:
   handler: index.handler
@@ -55,6 +60,22 @@ functions:
         method: post
         cors: true
         authorizer: aws_iam
+ updateInventory:
+  handler: updateInventory.main
+  events:
+    - http:
+        path: api/inventories
+        method: post
+        cors: true
+        authorizer: aws_iam      
+ compensateUpdateInventory:
+  handler: compensateUpdateInventory.main
+  events:
+    - http:
+        path: api/compensation/inventories
+        method: post
+        cors: true
+        authorizer: aws_iam          
  deleteAnOrder:
   handler: compensateCreateOrder.main
   events:
@@ -65,6 +86,42 @@ functions:
         authorizer: aws_iam
 resources:
  Resources:
+  ProcessedOrdersDynamoDBTable:
+   Type: 'AWS::DynamoDB::Table'
+   Properties:
+    AttributeDefinitions:
+     -
+      AttributeName: "orderId"
+      AttributeType: "S"
+     -
+      AttributeName: "version"
+      AttributeType: "N"
+    KeySchema:
+     -
+      AttributeName: "orderId"
+      KeyType: "HASH"
+     -
+      AttributeName: "version"
+      KeyType: "RANGE"
+    ProvisionedThroughput:
+     ReadCapacityUnits: 1
+     WriteCapacityUnits: 1
+    TableName: ${self:custom.processedOrderTableName}    
+  InventoryDynamoDBTable:
+   Type: 'AWS::DynamoDB::Table'
+   Properties:
+    AttributeDefinitions:
+     -
+      AttributeName: "itemId"
+      AttributeType: "S"
+    KeySchema:
+     -
+      AttributeName: "itemId"
+      KeyType: "HASH"
+    ProvisionedThroughput:
+     ReadCapacityUnits: 1
+     WriteCapacityUnits: 1
+    TableName: ${self:custom.inventoryTableName}        
   OrdersDynamoDBTable:
    Type: 'AWS::DynamoDB::Table'
    Properties:
@@ -85,5 +142,5 @@ resources:
     ProvisionedThroughput:
      ReadCapacityUnits: 1
      WriteCapacityUnits: 1
-    TableName: ${self:custom.tableName}      
+    TableName: ${self:custom.ordersTableName}      
     
