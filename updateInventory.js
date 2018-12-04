@@ -65,10 +65,7 @@ function buildUpdateInventoryRequests(order) {
           console.log('confirm params ', params)
           call('update',params)
             .then(result => callback(null, result))
-            .catch(error => {
-              console.log('confirming exception ', error)
-              return callback(error);
-            })
+            .catch(error => callback(error))
         }
       },function(error){
           if (error) {

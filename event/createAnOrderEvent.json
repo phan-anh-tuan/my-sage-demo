@@ -1,15 +1,18 @@
 {
+    "customerId": "C001",
     "orderId": "ID3",
     "items": [
         { 
             "itemId": "1",
             "name": "smart watch",
-            "quantity": 5
+            "quantity": 5,
+            "price": 100
         },
         {
             "itemId": "2",
             "name": "smart phone",
-            "quantity": 100
+            "quantity": 5,
+            "price": 800
         }
     ],
     "version": 1

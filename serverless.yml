@@ -15,6 +15,8 @@ custom:
  ordersTableName: 'orders-table-${self:provider.stage}'
  processedOrderTableName: 'processed-orders-table-${self:provider.stage}'
  inventoryTableName: 'inventory-table-${self:provider.stage}'
+ transactionHistoryTableName: 'transaction-history-table-${self:provider.stage}'
+ customerTableName: 'customer-table-${self:provider.stage}'
  dynamodb:
   start:
    migrate: true
@@ -45,6 +47,8 @@ provider:
   ORDERS_TABLE: ${self:custom.ordersTableName}
   PROCESSED_ORDER_TABLE: ${self:custom.processedOrderTableName}
   INVENTORY_TABLE: ${self:custom.inventoryTableName}
+  TRANSACTION_HISTORY_TABLE: ${self:custom.transactionHistoryTableName}
+  CUSTOMER_TABLE: ${self:custom.customerTableName}
 functions:
  app:
   handler: index.handler
@@ -84,6 +88,22 @@ functions:
         method: delete
         cors: true
         authorizer: aws_iam
+ updateCustomerCredit:
+  handler: updateCustomerCredit.main
+  events:
+    - http:
+        path: api/customer/credits
+        method: post
+        cors: true
+        authorizer: aws_iam          
+ compensateUpdateCustomerCredit:
+  handler: compensateUpdateCustomerCredit.main
+  events:
+    - http:
+        path: api/compensation/customer/credits
+        method: post
+        cors: true
+        authorizer: aws_iam       
 resources:
  Resources:
   ProcessedOrdersDynamoDBTable:
@@ -107,6 +127,42 @@ resources:
      ReadCapacityUnits: 1
      WriteCapacityUnits: 1
     TableName: ${self:custom.processedOrderTableName}    
+  TransactionHistoryDynamoDBTable:
+   Type: 'AWS::DynamoDB::Table'
+   Properties:
+    AttributeDefinitions:
+     -
+      AttributeName: "customerId"
+      AttributeType: "S"
+     -
+      AttributeName: "transactionId"
+      AttributeType: "S"
+    KeySchema:
+     -
+      AttributeName: "customerId"
+      KeyType: "HASH"
+     -
+      AttributeName: "transactionId"
+      KeyType: "RANGE"
+    ProvisionedThroughput:
+     ReadCapacityUnits: 1
+     WriteCapacityUnits: 1
+    TableName: ${self:custom.transactionHistoryTableName}    
+  CustomerDynamoDBTable:
+   Type: 'AWS::DynamoDB::Table'
+   Properties:
+    AttributeDefinitions:
+     -
+      AttributeName: "customerId"
+      AttributeType: "S"
+    KeySchema:
+     -
+      AttributeName: "customerId"
+      KeyType: "HASH"
+    ProvisionedThroughput:
+     ReadCapacityUnits: 1
+     WriteCapacityUnits: 1
+    TableName: ${self:custom.customerTableName}            
   InventoryDynamoDBTable:
    Type: 'AWS::DynamoDB::Table'
    Properties:
