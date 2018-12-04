@@ -25,7 +25,7 @@ function buildCompensatingUpdateCustomerCreditRequests(order) {
                 // see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TransactWriteItem.html
                 async.series({
                   rollback: function(callback){
-                    if (item.status === 'unconfirmed') return setImmediate(() => callback(null));
+                    if (item.Item.status === 'unconfirmed') return setImmediate(() => callback(null));
                     
                     const params = Object.assign({},
                       { TableName: process.env.CUSTOMER_TABLE },
