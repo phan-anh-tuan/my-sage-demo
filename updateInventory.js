@@ -1,59 +1,99 @@
-import validate from './lib/validation';
-import { success, failure } from './lib/response';
+import { success } from './lib/response';
 import { call } from './lib/dynamodb';
-import IdempotentVerificationException from './exception/IdempotentVerificationException';
+import UnrecoverableException from './exception/UnrecoverableException';
 import DuplicatedRequestException from './exception/DuplicatedRequestException';
-import ItemOutOfStockException from './exception/ItemOutOfStockException';
+import ValidationException from './exception/ValidationException';
 import async from 'async';
 
-function buildValidateOrderRequestParameter(order) {
-  const { orderId, version } = order;
-  // return Object.assign({}, { TableName: process.env.PROCESSED_ORDER_TABLE }, { Key : { 'orderId': orderId, 'version': version } });
-  return Object.assign({}, { TableName: process.env.PROCESSED_ORDER_TABLE }, { Item : { 'orderId': orderId, 'version': version }} , {  ConditionExpression: 'attribute_not_exists(orderId) AND attribute_not_exists(version)' } );
-}
-
-function buildUpdateInventoryRequests(orderItems) {
+function buildUpdateInventoryRequests(order) {
+  const { items, orderId, version } = order;
   // cannot use BatchWriteItem here due to some restrictions documented at #https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#batchWriteItem-property
   // BatchWriteItem does not behave in the same way as individual PutItem and DeleteItem calls would.
   // For example, you cannot specify conditions on individual put and delete requests, and BatchWriteItem does not return deleted items in the response.
-  return orderItems.map(function(item){
-    const params = Object.assign({},
-      { TableName: process.env.INVENTORY_TABLE },
-      { Key: { itemId: item.itemId }},
-      { UpdateExpression: 'ADD quantity :removedQuantity' } ,
-      { ExpressionAttributeValues: { ':removedQuantity': -1 * item.quantity, ':quantity': item.quantity }},
-      { ConditionExpression: ' quantity > :quantity' } );
-    console.log('Updating inventory: ',params)
-    
+  return items.map(function(item){
     return function(cb) {
-      call('update',params)
-        .then(result => {return cb(null, result)})
-        .catch(error => {
-          // retry behaviour is handled by aws sdk so we don't have to worry about it.
-          return cb(error);
-        });
+      // TODO: replace sequential calls with transactWriteItems when it is available on aws-sdk for nodejs
+      // see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TransactWriteItem.html
+      async.series({
+        validation: function(callback) {
+          const params = Object.assign({},
+            { TableName: process.env.PROCESSED_ORDER_TABLE },
+            { 
+              Item: { 
+                orderId: orderId.concat("#").concat(version),
+                itemId: item.itemId,
+                quantity: item.quantity,
+                status: 'unconfirmed',
+                lastUpdated: Date.now() //to unconfirmed item which is 1+ day old, is it safe to assume that it was processed unsuccessfully ?
+              }
+            },
+            {  ConditionExpression: 'attribute_not_exists(orderId) AND attribute_not_exists(itemId)' }
+          );
+          console.log('validation params ', params)
+          call('put',params)
+            .then(result => callback(null, result))
+            .catch(error => {
+              if (error.code === 'ConditionalCheckFailedException') {
+                return callback(new DuplicatedRequestException())
+              } else {
+                return callback(new ValidationException())
+              }
+            })
+        },
+        update: function(callback) {
+          const params = Object.assign({},
+            { TableName: process.env.INVENTORY_TABLE },
+            { Key: { itemId: item.itemId }},
+            { UpdateExpression: 'ADD quantity :removedQuantity' } ,
+            { ExpressionAttributeValues: { ':removedQuantity': -1 * item.quantity, ':quantity': item.quantity }},
+            { ConditionExpression: ' quantity > :quantity' } );
+          
+          console.log('update params ', params)
+          call('update',params)
+            .then(result => callback(null, result))
+            .catch(error => callback(error))
+        },
+        confirm: function(callback) {
+          const params = Object.assign({},
+            { TableName: process.env.PROCESSED_ORDER_TABLE },
+            { Key: { orderId: orderId.concat("#").concat(version), itemId: item.itemId }},
+            { UpdateExpression: 'SET #status = :confirmed' } ,
+            { ExpressionAttributeValues: { ':confirmed': 'confirmed' }},
+            { ExpressionAttributeNames: { '#status': 'status' }},
+            { ConditionExpression: 'attribute_exists(orderId) AND attribute_exists(itemId)' } );
+          
+          console.log('confirm params ', params)
+          call('update',params)
+            .then(result => callback(null, result))
+            .catch(error => {
+              console.log('confirming exception ', error)
+              return callback(error);
+            })
+        }
+      },function(error){
+          if (error) {
+            if (error.name === "DuplicatedRequestException") {
+              return cb(null, {})
+            } else {
+              return cb(error);
+            }
+          }
+          return cb(null, {})
+      });
     }
   })  
 }
 
-function PromisifyAsync(tasks, items) {
-  const failedItems = [];
+function PromisifyAsync(tasks) {
   return new Promise(function(resolve,reject){
     // use reflectAll to catch all errors otherwise async will stop task execution as the first error happen
     // assuming that each tasks will handle retryable errors
     async.parallel(async.reflectAll(tasks), (error, results) => {
-      results.map(function(result,idx){
-        if (result.error) {
-          failedItems.push(items[idx].itemId)
-        }
-      })
-      
-      if (failedItems.length > 0) {
-        console.log('updating inventory failedItems ', failedItems);
-        reject(new ItemOutOfStockException(failedItems.join(";")));
+      const isError = results.some((result) => { if (result.error) return true });
+      if (isError) {
+        return reject(new UnrecoverableException());
       } else {
-        console.log('updating inventory resolving the promise');
-        resolve(success(Object.assign({}, { success: true })));
+        return resolve(success(Object.assign({}, { success: true })));
       }
     });
   })
@@ -65,35 +105,16 @@ export async function main(event, context) {
   if (typeof event.body === "string") {
     data = JSON.parse(event.body);
   }
-  let params;
   
-  // for simplicity purpose we will skip input validation here
-  // instead relying on createOrder to do that.
-
+  const tasks = buildUpdateInventoryRequests(data);
   try {
-    // check if the order was processed earlier
-    params = buildValidateOrderRequestParameter(data);
-    const order = await call('put', params);
-  } catch (e) {
-    if (e.code === 'ConditionalCheckFailedException') {
-      throw new DuplicatedRequestException('Duplicated Order '.concat(data.orderId))
-    } else {
-      console.log('Order validation error: ',e);
-      throw new IdempotentVerificationException('orderId: '.concat(orderId.orderId)); 
-    }
-  }
-
-  const { items } = data;
-  const tasks = buildUpdateInventoryRequests(items);
-  
-  try {
-    return await PromisifyAsync(tasks, items);
+    return await PromisifyAsync(tasks);
   } catch(error) {
     // Exception Handling varies depend on event source
     // In case event source is step function (how to identify event source?), throw an exception so that step functions can deal with it
     // In case event source is API Gateway then  ????
-    console.log('Error updating inventtory ',error)
-    throw error;
+    console.log('Error updating inventory ',error)
+    throw new UnrecoverableException();
   }
   /*
   async.parallel(async.reflectAll(tasks), (error, results) => {

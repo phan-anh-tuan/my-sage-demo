@@ -94,14 +94,14 @@ resources:
       AttributeName: "orderId"
       AttributeType: "S"
      -
-      AttributeName: "version"
-      AttributeType: "N"
+      AttributeName: "itemId"
+      AttributeType: "S"
     KeySchema:
      -
       AttributeName: "orderId"
       KeyType: "HASH"
      -
-      AttributeName: "version"
+      AttributeName: "itemId"
       KeyType: "RANGE"
     ProvisionedThroughput:
      ReadCapacityUnits: 1
