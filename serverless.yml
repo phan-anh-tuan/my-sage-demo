@@ -39,6 +39,8 @@ provider:
       - { "Fn::GetAtt": ["OrdersDynamoDBTable", "Arn" ] }
       - { "Fn::GetAtt": ["InventoryDynamoDBTable", "Arn" ] }
       - { "Fn::GetAtt": ["ProcessedOrdersDynamoDBTable", "Arn" ] }
+      - { "Fn::GetAtt": ["CustomerDynamoDBTable", "Arn" ] }
+      - { "Fn::GetAtt": ["TransactionHistoryDynamoDBTable", "Arn" ] }      
   - Effect: Allow
     Action:
     - lambda:InvokeFunction

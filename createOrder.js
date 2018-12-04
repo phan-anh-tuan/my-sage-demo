@@ -17,6 +17,7 @@ export async function main(event, context) {
   } 
 
   const orderDetail = {
+    customerId: data.customerId,
     orderId: data.orderId,
     items: data.items,
     version: data.version, // this should be datetime ??
@@ -24,6 +25,7 @@ export async function main(event, context) {
   // validate input
   const { errors, value } = validate(orderDetail, 'order');
   if (errors) {
+    console.log('validation errors', errors);
     // Exception Handling varies depend on event source
     // In case event source is step function (how to identify event source?), throw an exception so that step functions can deal with it
     throw new InvalidParrameterError('Invalid Order Details'.concat(errors.toString()));
