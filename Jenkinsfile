@@ -3,6 +3,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 checkout scm
                 echo 'Finished checking out the source code!' 
                 archiveArtifacts artifacts: '**/README.md', fingerprint: true 
