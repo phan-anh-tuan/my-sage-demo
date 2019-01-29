@@ -13,7 +13,7 @@ Parameters:
   InstanceType:
     Description: WebServer EC2 instance type
     Type: String
-    Default: t2.small
+    Default: t2.micro
     AllowedValues:
     - t1.micro
     - t2.nano
@@ -328,7 +328,7 @@ Mappings:
       HVM64: ami-08569b978cc4dfa10
       HVMG2: ami-0be9df32ae9f92309
     ap-southeast-2:
-      HVM64: ami-09b42976632b27e9b
+      HVM64: ami-0789a5fb42dcccc10
       HVMG2: ami-0a9ce9fecc3d1daf8
     ap-south-1:
       HVM64: ami-0912f71e06545ad88
@@ -351,6 +351,60 @@ Mappings:
 Resources:
   EC2Instance:
     Type: AWS::EC2::Instance
+  Metadata:
+      AWS::CloudFormation::Init:
+        configSets:
+          full_install:
+          - install_and_enable_cfn_hup
+        install_and_enable_cfn_hup:
+          files:
+            "/etc/cfn/cfn-hup.conf":
+              content:
+                Fn::Join:
+                - ''
+                - - "[main]\n"
+                  - stack=
+                  - Ref: AWS::StackId
+                  - "\n"
+                  - region=
+                  - Ref: AWS::Region
+                  - "\n"
+              mode: '000400'
+              owner: root
+              group: root
+            "/etc/cfn/hooks.d/cfn-auto-reloader.conf":
+              content:
+                Fn::Join:
+                - ''
+                - - "[cfn-auto-reloader-hook]\n"
+                  - 'triggers=post.update'
+                  - 'path=Resources.EC2Instance.Metadata.AWS::CloudFormation::Init'
+                  - 'action=/opt/aws/bin/cfn-init -v '
+                  - "         --stack "
+                  - Ref: AWS::StackName
+                  - "         --resource EC2Instance "
+                  - "         --configsets full_install "
+                  - "         --region "
+                  - Ref: AWS::Region
+                  - "\n"
+                  - 'runas=root'
+            "/lib/systemd/system/cfn-hup.service":
+              content:
+                Fn::Join:
+                - ''
+                - - "[Unit]\n"
+                  - "Description=cfn-hup daemon\n\n"
+                  - "[Service]\n"
+                  - 'Type=simple'
+                  - 'ExecStart=/opt/aws/bin/cfn-hup'
+                  - "Restart=always\n\n"
+                  - "[Install]\n"
+                  - WantedBy=multi-user.target
+          commands:
+            01enable_cfn_hup:
+              command: systemctl enable cfn-hup.service
+            02start_cfn_hup:
+              command: systemctl start cfn-hup.service    
     Properties:
       InstanceType:
         Ref: InstanceType
@@ -366,6 +420,31 @@ Resources:
           - AWSInstanceType2Arch
           - Ref: InstanceType
           - Arch
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+          - ''
+          - - "#!/bin/bash -xe\n"
+            - 'apt-get update -y'
+            - 'apt-get install -y python-setuptools'
+            - 'mkdir -p /opt/aws/bin'
+            - 'wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz'
+            - 'easy_install --script-dir /opt/aws/bin aws-cfn-bootstrap-latest.tar.gz'
+            - "/opt/aws/bin/cfn-init -v "
+            - "         --stack "
+            - Ref: AWS::StackName
+            - "         --resource EC2Instance "
+            - "         --configsets full_install "
+            - "         --region "
+            - Ref: AWS::Region
+            - "\n"
+            - "/opt/aws/bin/cfn-signal -e $? "
+            - "         --stack "
+            - Ref: AWS::StackName
+            - "         --resource EC2Instance "
+            - "         --region "
+            - Ref: AWS::Region
+            - "\n"          
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
