@@ -407,7 +407,7 @@ Resources:
             02start_cfn_hup:
               command: systemctl start cfn-hup.service
             03add-apt-repository:
-              command: add-apt-repository ppa:ondrej/php
+              command: LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
             04update-apt:
               command: apt-get update
         install_dependencies:
