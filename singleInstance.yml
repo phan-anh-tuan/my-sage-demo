@@ -356,19 +356,8 @@ Resources:
         configSets:
           full_install:
           - install_and_enable_cfn_hup
+          - install_dependencies
         install_and_enable_cfn_hup:
-          commands:
-            01add-apt-repository:
-              command: add-apt-repository ppa:ondrej/php
-            02update-apt:
-              command: apt-get update
-          packages:
-            apt:
-              apache2: []
-              php: []
-              libapache2-mod-php: []
-              php-mcrypt: []
-              php-mysql: []
           files:
             "/etc/cfn/cfn-hup.conf":
               content:
@@ -412,6 +401,24 @@ Resources:
                   - "Restart=always\n\n"
                   - "[Install]\n"
                   - WantedBy=multi-user.target
+          commands:
+            01enable_cfn_hup:
+              command: systemctl enable cfn-hup.service
+            02start_cfn_hup:
+              command: systemctl start cfn-hup.service
+            03add-apt-repository:
+              command: add-apt-repository ppa:ondrej/php
+            04update-apt:
+              command: apt-get update
+        install_dependencies:
+          packages:
+            apt:
+              apache2: []
+              php: []
+              libapache2-mod-php: []
+              php-mcrypt: []
+              php-mysql: []
+          files:
             "/var/www/html/info.php":
               content:
                 Fn::Join:
@@ -419,16 +426,12 @@ Resources:
                 - - "<?php phpinfo(); ?>"
               mode: "000600"
               owner: "www-data"
-              group: "www-data"
+              group: "www-data"                  
           commands:
-            01enable_cfn_hup:
-              command: systemctl enable cfn-hup.service
-            02start_cfn_hup:
-              command: systemctl start cfn-hup.service
-            03enable_httpd:
+            01enable_httpd:
               command: systemctl enable apache2.service
-            04start_httpd:
-              command: systemctl start apache2.service
+            02start_httpd:
+              command: systemctl start apache2.service          
     Properties:
       InstanceType:
         Ref: InstanceType
