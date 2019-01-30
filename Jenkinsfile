@@ -14,7 +14,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-                echo "aws_access_key_id: $AWS_ACCESS_KEY_ID"
+                echo "test_access_key_id: $TEST_ACCESS_KEY_ID"
                 checkout scm
                 echo 'Finished checking out the source code!' 
                 archiveArtifacts artifacts: '**/README.md', fingerprint: true 
