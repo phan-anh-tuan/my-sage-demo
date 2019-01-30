@@ -15,6 +15,7 @@ pipeline {
             steps {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 echo "test_access_key_id: $TEST_ACCESS_KEY_ID"
+                sh label: '', returnStatus: true, script: 'printenv'
                 checkout scm
                 echo 'Finished checking out the source code!' 
                 archiveArtifacts artifacts: '**/README.md', fingerprint: true 
@@ -29,7 +30,7 @@ pipeline {
         
         stage('Provision CI environment') {
             steps {
-                sh label: '', returnStatus: true, script: 'aws cloudformation create-stack --template-body file://singleInstance.yml --stack-name single-instance --parameters ParameterKey=KeyName,ParameterValue=tuan.phan-key-pair-sydney'    
+                
                 echo 'CI environment provisioned!'
             }
         }
