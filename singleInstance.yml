@@ -414,10 +414,12 @@ Resources:
           packages:
             apt:
               apache2: []
-              php: []
-              libapache2-mod-php: []
-              php-mcrypt: []
-              php-mysql: []
+              php5.6: []
+              libapache2-mod-php5.6: []
+              php5.6-mysql: []
+              php5.6-mysqli: []
+              php5.6-curl: []
+              php5.6-xml: []
           files:
             "/var/www/html/info.php":
               content:
