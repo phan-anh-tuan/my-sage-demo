@@ -406,9 +406,13 @@ Resources:
               command: systemctl enable cfn-hup.service
             02start_cfn_hup:
               command: systemctl start cfn-hup.service
-            03add-apt-repository:
+            03purge-opensdk:
+              command: apt-get -y purge openjdk*
+            04add-apt-php-repository:
               command: LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
-            04update-apt:
+            05add-apt-java-repository:
+              command: add-apt-repository -y ppa:webupd8team/java
+            06update-apt:
               command: apt-get update
         install_dependencies:
           packages:
@@ -420,6 +424,8 @@ Resources:
               php5.6-mysqli: []
               php5.6-curl: []
               php5.6-xml: []
+              oracle-java8-installer: []
+              oracle-java8-set-default: []
           files:
             "/var/www/html/info.php":
               content:
