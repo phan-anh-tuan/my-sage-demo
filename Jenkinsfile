@@ -27,6 +27,13 @@ pipeline {
             }
         }
         
+        stage('Provision CI environment') {
+            steps {
+                sh label: '', returnStatus: true, script: 'aws cloudformation create-stack --template-body file://singleInstance.yml --stack-name single-instance --parameters ParameterKey=KeyName,ParameterValue=tuan.phan-key-pair-sydney'    
+                echo 'CI environment provisioned!'
+            }
+        }
+        
         stage('Staging') {
             when {
               expression {
