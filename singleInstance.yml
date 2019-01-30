@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'AWS CloudFormation Sample Template EC2InstanceWithSecurityGroupSample:
-  Create an Amazon EC2 instance running the Amazon Linux AMI. The AMI is chosen based
+  Create an Amazon EC2 instance running the Ubuntu 16.04 AMI. The AMI is chosen based
   on the region in which the stack is run. This example creates an EC2 security group
   for the instance to give you SSH access. **WARNING** This template creates an Amazon
   EC2 instance. You will be billed for the AWS resources used if you create a stack
@@ -351,12 +351,19 @@ Mappings:
 Resources:
   EC2Instance:
     Type: AWS::EC2::Instance
-  Metadata:
+    Metadata:
       AWS::CloudFormation::Init:
         configSets:
           full_install:
           - install_and_enable_cfn_hup
         install_and_enable_cfn_hup:
+          packages:
+            apt:
+              apache2: []
+              php: []
+              libapache2-mod-php: []
+              php-mcrypt: []
+              php-mysql: []
           files:
             "/etc/cfn/cfn-hup.conf":
               content:
@@ -377,9 +384,9 @@ Resources:
                 Fn::Join:
                 - ''
                 - - "[cfn-auto-reloader-hook]\n"
-                  - 'triggers=post.update'
-                  - 'path=Resources.EC2Instance.Metadata.AWS::CloudFormation::Init'
-                  - 'action=/opt/aws/bin/cfn-init -v '
+                  - "triggers=post.update\n"
+                  - "path=Resources.EC2Instance.Metadata.AWS::CloudFormation::Init\n"
+                  - "action=/opt/aws/bin/cfn-init -v "
                   - "         --stack "
                   - Ref: AWS::StackName
                   - "         --resource EC2Instance "
@@ -387,7 +394,7 @@ Resources:
                   - "         --region "
                   - Ref: AWS::Region
                   - "\n"
-                  - 'runas=root'
+                  - "runas=root"
             "/lib/systemd/system/cfn-hup.service":
               content:
                 Fn::Join:
@@ -395,16 +402,28 @@ Resources:
                 - - "[Unit]\n"
                   - "Description=cfn-hup daemon\n\n"
                   - "[Service]\n"
-                  - 'Type=simple'
-                  - 'ExecStart=/opt/aws/bin/cfn-hup'
+                  - "Type=simple\n"
+                  - "ExecStart=/opt/aws/bin/cfn-hup\n"
                   - "Restart=always\n\n"
                   - "[Install]\n"
                   - WantedBy=multi-user.target
+            "/var/www/html/info.php":
+              content:
+                Fn::Join:
+                - ''
+                - - "<?php phpinfo(); ?>"
+              mode: "000600"
+              owner: "www-data"
+              group: "www-data"
           commands:
             01enable_cfn_hup:
               command: systemctl enable cfn-hup.service
             02start_cfn_hup:
-              command: systemctl start cfn-hup.service    
+              command: systemctl start cfn-hup.service
+            03enable_httpd:
+              command: systemctl enable apache2.service
+            04start_httpd:
+              command: systemctl start apache2.service
     Properties:
       InstanceType:
         Ref: InstanceType
@@ -425,11 +444,11 @@ Resources:
           Fn::Join:
           - ''
           - - "#!/bin/bash -xe\n"
-            - 'apt-get update -y'
-            - 'apt-get install -y python-setuptools'
-            - 'mkdir -p /opt/aws/bin'
-            - 'wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz'
-            - 'easy_install --script-dir /opt/aws/bin aws-cfn-bootstrap-latest.tar.gz'
+            - "apt-get update -y\n"
+            - "apt-get install -y python-setuptools\n"
+            - "mkdir -p /opt/aws/bin\n"
+            - "wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n"
+            - "easy_install --script-dir /opt/aws/bin aws-cfn-bootstrap-latest.tar.gz\n"
             - "/opt/aws/bin/cfn-init -v "
             - "         --stack "
             - Ref: AWS::StackName
