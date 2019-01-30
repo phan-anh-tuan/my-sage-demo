@@ -357,6 +357,11 @@ Resources:
           full_install:
           - install_and_enable_cfn_hup
         install_and_enable_cfn_hup:
+          commands:
+            01add-apt-repository:
+              command: add-apt-repository ppa:ondrej/php
+            02update-apt:
+              command: apt-get update
           packages:
             apt:
               apache2: []
