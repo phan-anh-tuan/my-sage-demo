@@ -1,8 +1,9 @@
 pipeline {
     agent any 
     environment {
-        TEST_ACCESS_KEY_ID     = credentials('jenkins-aws-secret-key-id')
-        TEST_SECRET_ACCESS_KEY = credentials('jenkins-aws-secret-access-key')
+        AWS_ACCESS_KEY_ID     = credentials('jenkins-aws-secret-key-id')
+        AWS_SECRET_ACCESS_KEY = credentials('jenkins-aws-secret-access-key')
+        AWS_DEFAULT_REGION = credentials('jenkins-aws-default-region')
     }
     stages {
         stage('Preparation') {
@@ -14,7 +15,6 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-                echo "test_access_key_id: $TEST_ACCESS_KEY_ID"
                 sh label: '', returnStatus: true, script: 'printenv'
                 checkout scm
                 echo 'Finished checking out the source code!' 
@@ -30,7 +30,7 @@ pipeline {
         
         stage('Provision CI environment') {
             steps {
-                
+                sh label: '', returnStatus: true, script: 'aws cloudformation create-stack --template-body file://singleInstance.yml --stack-name single-instance --parameters ParameterKey=KeyName,ParameterValue=tuan.phan-key-pair-sydney'    
                 echo 'CI environment provisioned!'
             }
         }
