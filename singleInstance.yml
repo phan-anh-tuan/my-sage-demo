@@ -473,12 +473,19 @@ Resources:
             - "         --resource EC2Instance "
             - "         --region "
             - Ref: AWS::Region
-            - "\n"          
+            - "\n"
+    CreationPolicy: 
+      ResourceSignal:
+        Timeout: "PT5M"
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enable SSH access via port 22
+      GroupDescription: Enable HTTP and SSH access via port 80 and 22
       SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0
+        FromPort: '80'
+        IpProtocol: tcp
+        ToPort: '80'        
       - IpProtocol: tcp
         FromPort: '22'
         ToPort: '22'
