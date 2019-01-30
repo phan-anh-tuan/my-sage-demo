@@ -355,8 +355,8 @@ Resources:
       AWS::CloudFormation::Init:
         configSets:
           full_install:
-          - install_and_enable_cfn_hup
-          - install_dependencies
+          - "install_and_enable_cfn_hup"
+          - "install_dependencies"
         install_and_enable_cfn_hup:
           files:
             "/etc/cfn/cfn-hup.conf":
