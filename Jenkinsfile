@@ -41,6 +41,7 @@ pipeline {
                       echo "$STACK_STATUS"
                       //sleep 5s
                       STACK_STATUS = sh(label: '', returnStdout: true, script: 'aws cloudformation describe-stacks --stack-name single-instance |  python -c "import sys, json; print json.load(sys.stdin)[\'Stacks\'][0][\'StackStatus\']"')
+                    }
                 }
                 echo 'CI environment provisioned!'
             }
