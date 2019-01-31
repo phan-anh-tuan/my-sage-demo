@@ -22,12 +22,9 @@ pipeline {
             }
         }
         
-        stage('Test') {
+        stage('Unit Test') {
             steps {
                 echo 'unit test should be triggered here!' 
-                withCredentials([sshUserPrivateKey(credentialsId: 'tuanphan-key-pair-sydney.pem', keyFileVariable: 'PATH_TO_KEY_FILE', passphraseVariable: '', usernameVariable: '')]) {
-                    sh label: '', returnStatus: true, script: 'printenv'
-                }
             }
         }
         
@@ -37,21 +34,39 @@ pipeline {
                 script {
                     STACK_STATUS="CREATE_IN_PROGRESS"
                     while (!STACK_STATUS.trim().equalsIgnoreCase("CREATE_COMPLETE")) {
-                      sleep 30
+                      sleep 60
                       STACK_STATUS = sh(label: '', returnStdout: true, script: 'aws cloudformation describe-stacks --stack-name single-instance |  python -c "import sys, json; print json.load(sys.stdin)[\'Stacks\'][0][\'StackStatus\']"')
                     }
+                }
+                echo 'CI environment provisioned!'
+            }
+        }
+
+        stage('Deploy application to CI environment') {
+            steps {
+                script {
                     PUBLIC_IP = sh label: '', returnStdout: true, script: '''aws cloudformation describe-stacks --stack-name single-instance |  python -c "import sys, json; outputs = json.load(sys.stdin)[\'Stacks\'][0][\'Outputs\']
 for output in outputs:
  if output[\'OutputKey\'] == \'PublicIP\':
   print output[\'OutputValue\']"
 '''
                     println(PUBLIC_IP)
-                    
+                    environment {
+                        IP = $PUBLIC_IP
+                    }
+                    withCredentials([sshUserPrivateKey(credentialsId: 'tuanphan-key-pair-sydney.pem', keyFileVariable: 'PATH_TO_KEY_FILE', passphraseVariable: '', usernameVariable: '')]) {
+                        sh label: '', returnStatus: true, script: 'rsync -avz -e "ssh -i $PATH_TO_KEY_FILE" README.md ubuntu@$IP:/var/www/html'
+                    }
                 }
-                echo 'CI environment provisioned!'
             }
         }
         
+        stage('Integration Test') {
+            steps {
+                echo 'Katalon test should be triggered here!' 
+            }
+        }
+
         stage('Staging') {
             when {
               expression {
