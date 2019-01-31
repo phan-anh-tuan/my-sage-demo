@@ -37,11 +37,15 @@ pipeline {
                 script {
                     STACK_STATUS="CREATE_IN_PROGRESS"
                     while (!STACK_STATUS.trim().equalsIgnoreCase("CREATE_COMPLETE")) {
-                      //println(STACK_STATUS)
-                      //println(STACK_STATUS.trim().equalsIgnoreCase("CREATE_COMPLETE"))
                       sleep 5
                       STACK_STATUS = sh(label: '', returnStdout: true, script: 'aws cloudformation describe-stacks --stack-name single-instance |  python -c "import sys, json; print json.load(sys.stdin)[\'Stacks\'][0][\'StackStatus\']"')
                     }
+                    PUBLIC_IP = sh(label: '', returnStdout: true, script: 'aws cloudformation describe-stacks --stack-name single-instance |  python -c "import sys, json; outputs = json.load(sys.stdin)['Stacks'][0]['Outputs']
+for output in outputs:
+ if output['OutputKey'] == 'PublicIP':
+  print output['OutputValue']"')
+                    println(PUBLIC_IP)
+                    
                 }
                 echo 'CI environment provisioned!'
             }
