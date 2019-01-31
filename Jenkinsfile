@@ -51,14 +51,12 @@ for output in outputs:
  if output[\'OutputKey\'] == \'PublicIP\':
   print output[\'OutputValue\']"
 '''
-                    environment {
-                        IPADDR= PUBLIC_IP
-                    }   
                     //returnVal = sh label: '', returnStatus: true, script: "export IPADDR=$PUBLIC_IP"
                     //println returnVal
-                    sh label: '', script: 'printenv'
+                    command = 'rsync -avz -e "ssh -i $PATH_TO_KEY_FILE" README.md ubuntu@' + PUBLIC_IP + ':/var/www/html'
+                    println command
                     withCredentials([sshUserPrivateKey(credentialsId: 'tuanphan-key-pair-sydney.pem', keyFileVariable: 'PATH_TO_KEY_FILE', passphraseVariable: '', usernameVariable: '')]) {
-                        sh label: '', returnStatus: true, script: 'rsync -avz -e "ssh -i $PATH_TO_KEY_FILE" README.md ubuntu@$IPADDR:/var/www/html'
+                        sh label: '', returnStatus: true, script: command
                     }
                 }
             }
