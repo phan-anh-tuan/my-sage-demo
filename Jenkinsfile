@@ -37,6 +37,7 @@ pipeline {
                 script {
                     STACK_STATUS="CREATE_IN_PROGRESS"
                     while (!STACK_STATUS.equalsIgnoreCase("CREATE_COMPLETE")) {
+                      println(STACK_STATUS)
                       println(STACK_STATUS.equalsIgnoreCase("CREATE_COMPLETE"))
                       sleep 5
                       //STACK_STATUS="CREATE_COMPLETE"
