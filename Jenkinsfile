@@ -25,12 +25,15 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'unit test should be triggered here!' 
+                withCredentials([sshUserPrivateKey(credentialsId: 'tuanphan-key-pair-sydney.pem', keyFileVariable: 'PATH_TO_KEY_FILE', passphraseVariable: '', usernameVariable: '')]) {
+                    sh label: '', returnStatus: true, script: 'printenv'
+                }
             }
         }
         
         stage('Provision CI environment') {
             steps {
-                sh label: '', returnStatus: true, script: 'aws cloudformation create-stack --template-body file://singleInstance.yml --stack-name single-instance --parameters ParameterKey=KeyName,ParameterValue=tuan.phan-key-pair-sydney'    
+                //sh label: '', returnStatus: true, script: 'aws cloudformation create-stack --template-body file://singleInstance.yml --stack-name single-instance --parameters ParameterKey=KeyName,ParameterValue=tuan.phan-key-pair-sydney'    
                 echo 'CI environment provisioned!'
             }
         }
