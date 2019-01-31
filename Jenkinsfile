@@ -30,10 +30,9 @@ pipeline {
         
         stage('Provision CI environment') {
             steps {
-                sh label: '', returnStatus: true, script: 'aws cloudformation create-stack --template-body file://singleInstance.yml --stack-name single-instance --parameters ParameterKey=KeyName,ParameterValue=tuan.phan-key-pair-sydney'    
+                //sh label: '', returnStatus: true, script: 'aws cloudformation create-stack --template-body file://singleInstance.yml --stack-name single-instance --parameters ParameterKey=KeyName,ParameterValue=tuan.phan-key-pair-sydney'    
                 script {
-                    //STACK_STATUS="CREATE_IN_PROGRESS"
-                    STACK_STATUS="CREATE_COMPLETE"
+                    STACK_STATUS="CREATE_IN_PROGRESS"
                     while (!STACK_STATUS.trim().equalsIgnoreCase("CREATE_COMPLETE")) {
                       sleep 60
                       STACK_STATUS = sh(label: '', returnStdout: true, script: 'aws cloudformation describe-stacks --stack-name single-instance |  python -c "import sys, json; print json.load(sys.stdin)[\'Stacks\'][0][\'StackStatus\']"')
@@ -53,8 +52,9 @@ for output in outputs:
 '''
                     returnVal = sh label: '', returnStatus: true, script: "export IPADDR=$PUBLIC_IP"
                     println returnVal
+                    sh label: '', script: 'printenv'
                     withCredentials([sshUserPrivateKey(credentialsId: 'tuanphan-key-pair-sydney.pem', keyFileVariable: 'PATH_TO_KEY_FILE', passphraseVariable: '', usernameVariable: '')]) {
-                        sh label: '', returnStatus: true, script: 'rsync -avz -e "ssh -i $PATH_TO_KEY_FILE" README.md ubuntu@$IPADDR:/var/www/html'
+                        sh label: '', returnStatus: true, script: 'rsync -avz -e "ssh -i $PATH_TO_KEY_FILE" README.md ubuntu@"$IPADDR":/var/www/html'
                     }
                 }
             }
