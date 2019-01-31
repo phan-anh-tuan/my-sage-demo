@@ -40,10 +40,7 @@ pipeline {
                       sleep 5
                       STACK_STATUS = sh(label: '', returnStdout: true, script: 'aws cloudformation describe-stacks --stack-name single-instance |  python -c "import sys, json; print json.load(sys.stdin)[\'Stacks\'][0][\'StackStatus\']"')
                     }
-                    PUBLIC_IP = sh(label: '', returnStdout: true, script: 'aws cloudformation describe-stacks --stack-name single-instance |  python -c "import sys, json; outputs = json.load(sys.stdin)[\'Stacks\'][0][\'Outputs\']; \\
-for output in outputs: \\
- if output[\'OutputKey\'] == \'PublicIP\': \\
-  print output[\'OutputValue\']"')
+                    PUBLIC_IP = sh(label: '', returnStdout: true, script: 'aws cloudformation describe-stacks --stack-name single-instance |  python -c "import sys, json; outputs = json.load(sys.stdin)[\'Stacks\'][0][\'Outputs\']; \\n for output in outputs: \\n if output[\'OutputKey\'] == \'PublicIP\': \\n print output[\'OutputValue\']"')
                     println(PUBLIC_IP)
                     
                 }
