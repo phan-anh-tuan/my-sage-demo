@@ -51,7 +51,7 @@ for output in outputs:
  if output[\'OutputKey\'] == \'PublicIP\':
   print output[\'OutputValue\']"
 '''
-                    returnVal = sh label: '', returnStatus: true, script: 'export IP = $PUBLIC_IP'
+                    returnVal = sh label: '', returnStatus: true, script: "export IP = $PUBLIC_IP"
                     println returnVal
                     withCredentials([sshUserPrivateKey(credentialsId: 'tuanphan-key-pair-sydney.pem', keyFileVariable: 'PATH_TO_KEY_FILE', passphraseVariable: '', usernameVariable: '')]) {
                         sh label: '', returnStatus: true, script: 'rsync -avz -e "ssh -i $PATH_TO_KEY_FILE" README.md ubuntu@"$IP":/var/www/html'
