@@ -64,9 +64,9 @@ pipeline {
 
 @NonCPS
 def wait_for_ci_environment() {
-    n=1
+    def n=1
     while (( $n <= 5 )) {
         echo "Welcome $n times."
-        n=$(( n+1 ))	
+        n=$n+1
     }
 }
