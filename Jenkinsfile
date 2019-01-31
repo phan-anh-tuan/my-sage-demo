@@ -38,9 +38,9 @@ pipeline {
                     STACK_STATUS="CREATE_IN_PROGRESS"
                     while (STACK_STATUS != 'CREATE_COMPLETE') {
                       echo "$STACK_STATUS"
-                      sleep 5s
-                      STACK_STATUS="CREATE_COMPLETE"
-                      //STACK_STATUS = sh(label: '', returnStdout: true, script: 'aws cloudformation describe-stacks --stack-name single-instance |  python -c "import sys, json; print json.load(sys.stdin)[\'Stacks\'][0][\'StackStatus\']"')
+                      sleep 5
+                      //STACK_STATUS="CREATE_COMPLETE"
+                      STACK_STATUS = sh(label: '', returnStdout: true, script: 'aws cloudformation describe-stacks --stack-name single-instance |  python -c "import sys, json; print json.load(sys.stdin)[\'Stacks\'][0][\'StackStatus\']"')
                     }
                 }
                 echo 'CI environment provisioned!'
