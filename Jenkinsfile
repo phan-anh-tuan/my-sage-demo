@@ -36,15 +36,12 @@ pipeline {
                 //sh label: '', returnStatus: true, script: 'aws cloudformation create-stack --template-body file://singleInstance.yml --stack-name single-instance --parameters ParameterKey=KeyName,ParameterValue=tuan.phan-key-pair-sydney'    
                 script {
                     STACK_STATUS="CREATE_IN_PROGRESS"
-                    while [ "$STACK_STATUS" != "CREATE_COMPLETE" ]
-                    do
-                    //while (STACK_STATUS != 'CREATE_COMPLETE') {
+                    while (STACK_STATUS != 'CREATE_COMPLETE') {
                       echo "$STACK_STATUS"
                       sleep 5s
                       STACK_STATUS="CREATE_COMPLETE"
                       //STACK_STATUS = sh(label: '', returnStdout: true, script: 'aws cloudformation describe-stacks --stack-name single-instance |  python -c "import sys, json; print json.load(sys.stdin)[\'Stacks\'][0][\'StackStatus\']"')
-                    //}
-                    done
+                    }
                 }
                 echo 'CI environment provisioned!'
             }
