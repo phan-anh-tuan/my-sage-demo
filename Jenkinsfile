@@ -43,11 +43,7 @@ pipeline {
                       STACK_STATUS = sh(label: '', returnStdout: true, script: 'aws cloudformation describe-stacks --stack-name single-instance |  python -c "import sys, json; print json.load(sys.stdin)[\'Stacks\'][0][\'StackStatus\']"')
                       echo "STATUS: $STACK_STATUS"
                     done*/
-                    n=1
-                    while (( $n <= 5 )) do
-                        echo "Welcome $n times."
-                        n=$(( n+1 ))	
-                    done
+                    wait_for_ci_environment()
                 }
                 echo 'CI environment provisioned!'
             }
@@ -64,4 +60,13 @@ pipeline {
             }
         }
     }
+}
+
+@NonCPS
+def wait_for_ci_environment() {
+    n=1
+    while (( $n <= 5 )) do
+        echo "Welcome $n times."
+        n=$(( n+1 ))	
+    done
 }
