@@ -44,8 +44,7 @@ pipeline {
                       echo "STATUS: $STACK_STATUS"
                     done*/
                     n=1
-                    while (( $n <= 5 ))
-                    do
+                    while (( $n <= 5 )) do
                         echo "Welcome $n times."
                         n=$(( n+1 ))	
                     done
