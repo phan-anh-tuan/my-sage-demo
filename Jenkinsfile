@@ -57,7 +57,7 @@ for output in outputs:
                     withCredentials([sshUserPrivateKey(credentialsId: 'tuanphan-key-pair-sydney.pem', keyFileVariable: 'PATH_TO_KEY_FILE', passphraseVariable: '', usernameVariable: '')]) {
                         command = 'rsync -avz -e "ssh -i $PATH_TO_KEY_FILE" README.md ubuntu@' + PUBLIC_IP + ':/home/ubuntu'
                         println command
-                        sh label: '', returnStatus: true, script: command
+                        sh label: '', script: 'rsync -avz -e "ssh -i $PATH_TO_KEY_FILE" README.md ubuntu@13.236.152.149:/home/ubuntu'
                     }
                 }
             }
