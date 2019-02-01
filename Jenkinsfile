@@ -56,7 +56,8 @@ for output in outputs:
                     //println returnVal
                     sshagent(['tuanphan-key-pair-sydney.pem']) {
                         //sh 'ssh -o StrictHostKeyChecking=no -l ubuntu 13.236.152.149 uname -a'
-                        sh "rsync -avz -e 'ssh -o StrictHostKeyChecking=no' README.md ubuntu@$PUBLIC_IP:/home/ubuntu"
+                         returnVal = sh label: '', returnStatus: true, script: "rsync -avz -e 'ssh -o StrictHostKeyChecking=no' README.md ubuntu@$PUBLIC_IP:/home/ubuntu"
+                         println returnVal
                     }
                     /*
                     withCredentials([sshUserPrivateKey(credentialsId: 'tuanphan-key-pair-sydney.pem', keyFileVariable: 'PATH_TO_KEY_FILE', passphraseVariable: '', usernameVariable: '')]) {
