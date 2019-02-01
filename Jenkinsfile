@@ -54,11 +54,15 @@ for output in outputs:
                     PUBLIC_IP = PUBLIC_IP.trim()
                     //returnVal = sh label: '', returnStatus: true, script: "export IPADDR=$PUBLIC_IP"
                     //println returnVal
+                    sshagent(['tuanphan-key-pair-sydney.pem']) {
+                        sh label: '', script: 'rsync -avz README.md ubuntu@13.236.152.149:/home/ubuntu'
+                    }
+                    /*
                     withCredentials([sshUserPrivateKey(credentialsId: 'tuanphan-key-pair-sydney.pem', keyFileVariable: 'PATH_TO_KEY_FILE', passphraseVariable: '', usernameVariable: '')]) {
                         command = 'rsync -avz -e "ssh -i $PATH_TO_KEY_FILE" README.md ubuntu@' + PUBLIC_IP + ':/home/ubuntu'
                         println command
                         sh label: '', script: 'rsync -avz -e "ssh -i $PATH_TO_KEY_FILE" README.md ubuntu@13.236.152.149:/home/ubuntu'
-                    }
+                    }*/
                 }
             }
         }
