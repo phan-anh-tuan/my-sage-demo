@@ -56,7 +56,7 @@ for output in outputs:
                     //println returnVal
                     withCredentials([sshUserPrivateKey(credentialsId: 'tuanphan-key-pair-sydney.pem', keyFileVariable: 'PATH_TO_KEY_FILE', passphraseVariable: '', usernameVariable: '')]) {
                         sh label: '', returnStatus: true, script: 'cat $PATH_TO_KEY_FILE'
-                        sh label: '', returnStatus: true, script: "rsync -avz -e """ssh -i $PATH_TO_KEY_FILE""" README.md ubuntu@$PUBLIC_IP:/var/www/html"
+                        sh label: '', returnStatus: true, script: "rsync -avz -e 'ssh -i $PATH_TO_KEY_FILE' README.md ubuntu@$PUBLIC_IP:/var/www/html"
                     }
                 }
             }
