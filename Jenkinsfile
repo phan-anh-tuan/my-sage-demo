@@ -55,7 +55,7 @@ for output in outputs:
                     //returnVal = sh label: '', returnStatus: true, script: "export IPADDR=$PUBLIC_IP"
                     //println returnVal
                     sshagent(['tuanphan-key-pair-sydney.pem']) {
-                        sh label: '', script: 'rsync -avz README.md ubuntu@13.236.152.149:/home/ubuntu'
+                        sh 'ssh -o StrictHostKeyChecking=no -l ubuntu 13.236.152.149 uname -a'
                     }
                     /*
                     withCredentials([sshUserPrivateKey(credentialsId: 'tuanphan-key-pair-sydney.pem', keyFileVariable: 'PATH_TO_KEY_FILE', passphraseVariable: '', usernameVariable: '')]) {
