@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Preparation') {
             steps {
-                sh label: '', returnStatus: true, script: 'sudo apt install python3-pip -y && sudo pip install --upgrade pip && sudo pip3 install awscli --upgrade && aws --version     '
+                sh label: '', returnStatus: true, script: 'sudo apt install python3-pip -y && sudo pip install --upgrade pip && sudo pip3 install awscli --upgrade && aws --version'
             }
         }
        
@@ -44,6 +44,8 @@ pipeline {
 
         stage('Deploy application to CI environment') {
             steps {
+                pwd()
+                sh label: '', script: 'ls -la'
                 script {
                     PUBLIC_IP = sh label: '', returnStdout: true, script: '''aws cloudformation describe-stacks --stack-name single-instance |  python -c "import sys, json; outputs = json.load(sys.stdin)[\'Stacks\'][0][\'Outputs\']
 for output in outputs:
@@ -53,8 +55,8 @@ for output in outputs:
                     PUBLIC_IP = PUBLIC_IP.trim()
                     sshagent(['tuanphan-key-pair-sydney.pem']) {
                         //sh 'ssh -o StrictHostKeyChecking=no -l ubuntu 13.236.152.149 uname -a'
-                         returnVal = sh label: '', returnStatus: true, script: "rsync -avz -e 'ssh -o StrictHostKeyChecking=no' README.md ubuntu@$PUBLIC_IP:/home/ubuntu"
-                         println returnVal
+                        returnVal = sh label: '', returnStatus: true, script: "rsync -avz -e 'ssh -o StrictHostKeyChecking=no' README.md ubuntu@$PUBLIC_IP:/home/ubuntu"
+                        println returnVal
                     }
                 }
             }
