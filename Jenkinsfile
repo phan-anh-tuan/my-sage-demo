@@ -55,7 +55,7 @@ for output in outputs:
                     PUBLIC_IP = PUBLIC_IP.trim()
                     sshagent(['tuanphan-key-pair-sydney.pem']) {
                         //sh 'ssh -o StrictHostKeyChecking=no -l ubuntu 13.236.152.149 uname -a'
-                        returnVal = sh label: '', returnStatus: true, script: "rsync -avz -e 'ssh -o StrictHostKeyChecking=no' --delete-after --exclude '.git' . ubuntu@$PUBLIC_IP:/var/www/html"
+                        returnVal = sh label: '', returnStatus: true, script: "rsync -avz -e 'ssh -o StrictHostKeyChecking=no' --delete-after --delete-excluded --exclude '.git' . ubuntu@$PUBLIC_IP:/var/www/html"
                         println returnVal
                     }
                 }
