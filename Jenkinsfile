@@ -54,8 +54,8 @@ for output in outputs:
                     //returnVal = sh label: '', returnStatus: true, script: "export IPADDR=$PUBLIC_IP"
                     //println returnVal
                     withCredentials([sshUserPrivateKey(credentialsId: 'tuanphan-key-pair-sydney.pem', keyFileVariable: 'PATH_TO_KEY_FILE', passphraseVariable: '', usernameVariable: '')]) {
-                        command = 'rsync -avz -e \"ssh -i $PATH_TO_KEY_FILE\" README.md ubuntu@' + PUBLIC_IP.trim() + ':/var/www/html'
-                        sh label: '', returnStatus: true, script: command
+                        sh label: '', returnStatus: true, script: '''rsync -avz -e "ssh -i $PATH_TO_KEY_FILE" README.md \'ubuntu@\' + PUBLIC_IP.trim() + \':/var/www/html\'
+'''
                     }
                 }
             }
