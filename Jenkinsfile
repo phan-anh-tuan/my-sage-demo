@@ -15,7 +15,6 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-                //sh label: '', returnStatus: true, script: 'printenv'
                 checkout scm
                 echo 'Finished checking out the source code!' 
                 archiveArtifacts artifacts: '**/README.md', fingerprint: true 
@@ -52,19 +51,11 @@ for output in outputs:
   print output[\'OutputValue\']"
 '''
                     PUBLIC_IP = PUBLIC_IP.trim()
-                    //returnVal = sh label: '', returnStatus: true, script: "export IPADDR=$PUBLIC_IP"
-                    //println returnVal
                     sshagent(['tuanphan-key-pair-sydney.pem']) {
                         //sh 'ssh -o StrictHostKeyChecking=no -l ubuntu 13.236.152.149 uname -a'
                          returnVal = sh label: '', returnStatus: true, script: "rsync -avz -e 'ssh -o StrictHostKeyChecking=no' README.md ubuntu@$PUBLIC_IP:/home/ubuntu"
                          println returnVal
                     }
-                    /*
-                    withCredentials([sshUserPrivateKey(credentialsId: 'tuanphan-key-pair-sydney.pem', keyFileVariable: 'PATH_TO_KEY_FILE', passphraseVariable: '', usernameVariable: '')]) {
-                        command = 'rsync -avz -e "ssh -i $PATH_TO_KEY_FILE" README.md ubuntu@' + PUBLIC_IP + ':/home/ubuntu'
-                        println command
-                        sh label: '', script: 'rsync -avz -e "ssh -i $PATH_TO_KEY_FILE" README.md ubuntu@13.236.152.149:/home/ubuntu'
-                    }*/
                 }
             }
         }
