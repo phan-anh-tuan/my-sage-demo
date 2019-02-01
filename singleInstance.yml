@@ -415,6 +415,7 @@ Resources:
           packages:
             apt:
               apache2: []
+              python-software-properties: []
               php5.6: []
               libapache2-mod-php5.6: []
               php5.6-mysql: []
@@ -433,10 +434,12 @@ Resources:
               owner: "www-data"
               group: "www-data"                  
           commands:
-            01enable_httpd:
+            01change_document_root_folder_ownership:
+              command: chown -R ubuntu /var/www/html
+            02enable_httpd:
               command: systemctl enable apache2.service
-            02start_httpd:
-              command: systemctl start apache2.service          
+            03start_httpd:
+              command: systemctl start apache2.service
     Properties:
       InstanceType:
         Ref: InstanceType
