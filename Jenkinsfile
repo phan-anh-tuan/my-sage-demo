@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Preparation') {
             steps {
-                sh label: '', script: 'sudo apt install python-pip -y && pip install awscli --upgrade && aws --version'
+                sh label: '', script: 'sudo apt install python-pip -y &&  pip uninstall awscli && pip install awscli --upgrade && aws --version'
             }
         }
        
