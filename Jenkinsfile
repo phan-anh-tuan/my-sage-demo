@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Preparation') {
             steps {
-                sh label: '', returnStatus: true, script: 'sudo apt install python3-pip -y && sudo pip install --upgrade pip && sudo pip3 install awscli --upgrade && aws --version'
+                sh label: '', returnStatus: true, script: 'sudo apt install python3-pip -y && sudo pip install --upgrade pip && sudo pip install awscli --upgrade && aws --version'
             }
         }
        
@@ -23,6 +23,7 @@ pipeline {
         
         stage('Unit Test') {
             steps {
+                sh label: '', script: 'printenv'
                 echo 'unit test should be triggered here!' 
             }
         }
