@@ -57,7 +57,7 @@ for output in outputs:
                     sh label: '', returnStdout: true, script: "sed -i 's/IP/$PUBLIC_IP/g' Profiles/default.glbl"
                     sshagent(['tuanphan-key-pair-sydney.pem']) {
                         //sh 'ssh -o StrictHostKeyChecking=no -l ubuntu 13.236.152.149 uname -a'
-                        returnVal = sh label: '', returnStatus: true, script: "rsync -avz -e 'ssh -o StrictHostKeyChecking=no' --delete-after --delete-excluded --exclude '.git' . ubuntu@$PUBLIC_IP:/var/www/html"
+                        returnVal = sh label: '', returnStatus: true, script: "rsync -avz -e 'ssh -o StrictHostKeyChecking=no' --delete-after --delete-excluded --exclude '.git' --exclude 'report' --exclude 'Test*' . ubuntu@$PUBLIC_IP:/var/www/html"
                         println returnVal
                     }
                 }
