@@ -54,6 +54,7 @@ for output in outputs:
   print output[\'OutputValue\']"
 '''
                     PUBLIC_IP = PUBLIC_IP.trim()
+                    sh label: '', returnStdout: true, script: "sed -i 's/IP/$PUBLIC_IP/g' Profiles/default.glbl'"
                     sshagent(['tuanphan-key-pair-sydney.pem']) {
                         //sh 'ssh -o StrictHostKeyChecking=no -l ubuntu 13.236.152.149 uname -a'
                         returnVal = sh label: '', returnStatus: true, script: "rsync -avz -e 'ssh -o StrictHostKeyChecking=no' --delete-after --delete-excluded --exclude '.git' . ubuntu@$PUBLIC_IP:/var/www/html"
@@ -71,8 +72,7 @@ for output in outputs:
                 }
             }
             steps {
-                // sh 'katalon-execute.sh -browserType="Chrome" -retry=0 -statusDelay=15 -testSuitePath="Test Suites/TS_RegressionTest"'
-                sh "sed -i 's/IP/www.vnexpress.net/g' Profiles/default.glbl'"
+                sh 'katalon-execute.sh -browserType="Chrome" -retry=0 -statusDelay=15 -testSuitePath="Test Suites/RegressionTest"'
                 echo 'Katalon test should be triggered here!' 
             }
             
