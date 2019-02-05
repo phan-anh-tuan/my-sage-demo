@@ -67,7 +67,7 @@ for output in outputs:
         stage('Integration Test') {
             steps {
                 withDockerContainer(args: '-u root', image: 'katalonstudio/katalon') {
-                    sh 'katalon-execute.sh -browserType="Chrome" -retry=0 -statusDelay=15 -testSuitePath="Test Suites/RegressionTest"'
+                    sh 'katalon-execute.sh -browserType="Chrome" -retry=0 -statusDelay=15 -testSuitePath="katalon-test/Test Suites/RegressionTest"'
                     echo 'Katalon test should be triggered here!' 
                 }   
             }
