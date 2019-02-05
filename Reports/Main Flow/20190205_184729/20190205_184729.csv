@@ -1,7 +1,0 @@
-Suite/Test/Step Name,Browser,Description,Start time,End time,Duration,Status
-Main Flow,Chrome 72.0.3626.81,,2019-02-05 18:47:38,2019-02-05 18:47:53,15.335s,FAILED
-,,,,,,
-Test Cases/Home Page,Chrome 72.0.3626.81,,2019-02-05 18:47:38,2019-02-05 18:47:52,14.085s,FAILED
-"openBrowser("""")",Chrome 72.0.3626.81,,2019-02-05 18:47:39,2019-02-05 18:47:45,6.775s,PASSED
-"navigateToUrl(""https://katalon-demo-cura.herokuapp.com/"")",Chrome 72.0.3626.81,,2019-02-05 18:47:45,2019-02-05 18:47:52,6.061s,PASSED
-"verifyTextPresent(""We Don't Care About Your Health"", false)",Chrome 72.0.3626.81,,2019-02-05 18:47:52,2019-02-05 18:47:52,0.877s,FAILED
