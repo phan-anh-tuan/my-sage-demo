@@ -15,9 +15,9 @@ import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 
 try {
-	WebUI.openBrowser('')
+	WebUI.openBrowser(GlobalVariable.G_SiteURL)
 
-	WebUI.navigateToUrl(GlobalVariable.G_SiteURL)
+	//WebUI.navigateToUrl(GlobalVariable.G_SiteURL)
 
 	WebUI.verifyTextPresent("We Don't Care About Your Health", false)
 
