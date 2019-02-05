@@ -65,17 +65,18 @@ for output in outputs:
         }
         
         stage('Integration Test') {
-            agent {
-                docker {
-                    image 'katalonstudio/katalon'
-                    args "-u root"
-                }
+            withDockerContainer(args: '-u root', image: 'katalonstudio/katalon') {
+                steps {
+                    sh 'katalon-execute.sh -browserType="Chrome" -retry=0 -statusDelay=15 -testSuitePath="Test Suites/RegressionTest"'
+                    echo 'Katalon test should be triggered here!' 
+                }   
             }
-            steps {
-                sh 'katalon-execute.sh -browserType="Chrome" -retry=0 -statusDelay=15 -testSuitePath="Test Suites/RegressionTest"'
-                echo 'Katalon test should be triggered here!' 
-            }
-            
+            //agent {
+            //    docker {
+            //        image 'katalonstudio/katalon'
+            //        args "-u root"
+            //    }
+           // }
             //post {
             //    always {
             //        archiveArtifacts artifacts: 'report/**/*.*', fingerprint: true
