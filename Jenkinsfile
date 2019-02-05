@@ -64,9 +64,24 @@ for output in outputs:
         }
         
         stage('Integration Test') {
+            agent {
+                docker {
+                    image 'katalonstudio/katalon'
+                    args "-u root"
+                }
+            }
             steps {
+                // sh 'katalon-execute.sh -browserType="Chrome" -retry=0 -statusDelay=15 -testSuitePath="Test Suites/TS_RegressionTest"'
+                sh "sed -i 's/IP/www.vnexpress.net/g' Profiles/default.glbl'"
                 echo 'Katalon test should be triggered here!' 
             }
+            
+            //post {
+            //    always {
+            //        archiveArtifacts artifacts: 'report/**/*.*', fingerprint: true
+            //        junit 'report/**/JUnit_Report.xml'
+            //    }
+            //}
         }
 
         stage('Staging') {
