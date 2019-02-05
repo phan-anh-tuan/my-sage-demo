@@ -30,10 +30,10 @@ pipeline {
         
         stage('Provision CI environment') {
             steps {
-                sh label: '', returnStatus: true, script: 'aws cloudformation create-stack --template-body file://singleInstance.yml --stack-name single-instance --parameters ParameterKey=KeyName,ParameterValue=tuan.phan-key-pair-sydney'    
+                // sh label: '', returnStatus: true, script: 'aws cloudformation create-stack --template-body file://singleInstance.yml --stack-name single-instance --parameters ParameterKey=KeyName,ParameterValue=tuan.phan-key-pair-sydney'    
                 script {
-                    STACK_STATUS="CREATE_IN_PROGRESS"
-                    // STACK_STATUS="CREATE_COMPLETE"
+                    // STACK_STATUS="CREATE_IN_PROGRESS"
+                    STACK_STATUS="CREATE_COMPLETE"
                     while (!STACK_STATUS.trim().equalsIgnoreCase("CREATE_COMPLETE")) {
                       sleep 60
                       STACK_STATUS = sh(label: '', returnStdout: true, script: 'aws cloudformation describe-stacks --stack-name single-instance |  python -c "import sys, json; print json.load(sys.stdin)[\'Stacks\'][0][\'StackStatus\']"')
@@ -54,7 +54,7 @@ for output in outputs:
   print output[\'OutputValue\']"
 '''
                     PUBLIC_IP = PUBLIC_IP.trim()
-                    sh label: '', returnStdout: true, script: "sed -i 's/IP/$PUBLIC_IP/g' Profiles/default.glbl"
+                    sh label: '', returnStdout: true, script: "sed -i 's/IP/$PUBLIC_IP/g' katalon-test/Profiles/default.glbl"
                     sshagent(['tuanphan-key-pair-sydney.pem']) {
                         //sh 'ssh -o StrictHostKeyChecking=no -l ubuntu 13.236.152.149 uname -a'
                         returnVal = sh label: '', returnStatus: true, script: "rsync -avz -e 'ssh -o StrictHostKeyChecking=no' --delete-after --delete-excluded --exclude '.git' --exclude 'katalon-test' . ubuntu@$PUBLIC_IP:/var/www/html"
