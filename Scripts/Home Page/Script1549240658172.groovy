@@ -21,8 +21,6 @@ try {
 
 	WebUI.verifyTextPresent("PHP Version 5.6.40-1", false)
 
-	WebUI.click(findTestObject('Object Repository/Page_CURA Healthcare Service/a_Make Appointment'))
-
 }
 finally {
 	WebUI.closeBrowser()
