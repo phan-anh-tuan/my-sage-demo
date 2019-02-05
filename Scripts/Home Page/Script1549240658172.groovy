@@ -19,7 +19,7 @@ try {
 
 	//WebUI.navigateToUrl(GlobalVariable.G_SiteURL)
 
-	WebUI.verifyTextPresent("We Don't Care About Your Health", false)
+	WebUI.verifyTextPresent("PHP Version 5.6.40-1", false)
 
 	WebUI.click(findTestObject('Object Repository/Page_CURA Healthcare Service/a_Make Appointment'))
 
