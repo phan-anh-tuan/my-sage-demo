@@ -6,7 +6,7 @@
    <defaultProfile>true</defaultProfile>
    <GlobalVariableEntity>
       <description></description>
-      <initValue>http://IP/phpinfo.php</initValue>
+      <initValue>'http://IP/phpinfo.php'</initValue>
       <name>G_SiteURL</name>
    </GlobalVariableEntity>
 </GlobalVariableEntities>
