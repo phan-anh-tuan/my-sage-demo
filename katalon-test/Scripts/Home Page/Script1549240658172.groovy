@@ -19,7 +19,8 @@ try {
 
 	//WebUI.navigateToUrl(GlobalVariable.G_SiteURL)
 
-	WebUI.verifyTextPresent("PHP Version 5.6.40-1", false)
+	// WebUI.verifyTextPresent("PHP Version 5.6.40-1", false)
+	WebUI.verifyTextPresent("This text doesnt exist", false)
 
 }
 finally {
