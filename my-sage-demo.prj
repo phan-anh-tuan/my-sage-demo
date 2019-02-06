@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Project>
    <description></description>
-   <name>katalon-test</name>
+   <name>my-sage-demo</name>
    <tag></tag>
    <UUID>0f1570ad-d80b-41b1-bb85-bed38a61ec84</UUID>
    <migratedVersion>5.9.0</migratedVersion>

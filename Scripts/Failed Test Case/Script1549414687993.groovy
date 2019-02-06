@@ -16,8 +16,8 @@ import org.openqa.selenium.Keys as Keys
 
 try {
 	WebUI.openBrowser(GlobalVariable.G_SiteURL)
-	//WebUI.navigateToUrl(GlobalVariable.G_SiteURL)
-	WebUI.verifyTextPresent("PHP Version 5.6.40-1", false)
+	// WebUI.verifyTextPresent("PHP Version 5.6.40-1", false)
+	WebUI.verifyTextPresent("This text doesnt exist", false)
 }
 finally {
 	WebUI.closeBrowser()

@@ -21,7 +21,7 @@ public class GlobalVariable {
 
     static {
         def allVariables = [:]        
-        allVariables.put('default', ['G_SiteURL' : 'https://katalon-demo-cura.herokuapp.com'])
+        allVariables.put('default', ['G_SiteURL' : 'http://IP/phpinfo.php'])
         
         String profileName = RunConfiguration.getExecutionProfile()
         def selectedVariables = allVariables[profileName]
