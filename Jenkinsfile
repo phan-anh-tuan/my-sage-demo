@@ -82,7 +82,9 @@ for output in outputs:
             post {
                 always {
                     archiveArtifacts artifacts: 'report/**/*.*', fingerprint: true
-                    junit 'report/**/JUnit_Report.xml'
+                    // junit 'report/**/JUnit_Report.xml'
+                    junit allowEmptyResults: true, healthScaleFactor: 5.0, testResults: 'report/**/JUnit_Report.xml'
+                    echo "Build result $currentBuild.result"
                 }
             }
         }
