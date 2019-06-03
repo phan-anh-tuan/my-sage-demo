@@ -18,6 +18,10 @@ pipeline {
                 checkout scm
                 echo 'Finished checking out the source code!' 
                 archiveArtifacts artifacts: '**/README.md', fingerprint: true 
+                emailext attachLog: false, body: '''$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:
+                 GIT COMMIT $GIT_REVISION
+                 GIT BRANCH $GIT_BRANCH''', compressLog: true, replyTo: 'phan.anh.tuan@gmail.com', subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!', to: "tuan.phan@informed.com"
+                error 'pipeline stopped here'
             }
         }
         
