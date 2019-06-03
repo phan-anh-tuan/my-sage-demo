@@ -6,11 +6,11 @@ pipeline {
         AWS_DEFAULT_REGION = credentials('jenkins-aws-default-region')
     }
     stages {
-        stage('Preparation') {
-            steps {
-                // sh label: '', script: 'sudo apt install python-pip -y &&  sudo pip install awscli --upgrade && aws --version'
-            }
-        }
+        //stage('Preparation') {
+        //    steps {
+        //        sh label: '', script: 'sudo apt install python-pip -y &&  sudo pip install awscli --upgrade && aws --version'
+        //    }
+        //}
        
         stage('Build') {
             steps {
