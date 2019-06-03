@@ -25,7 +25,7 @@ pipeline {
                 }
                 // archiveArtifacts artifacts: '**/README.md', fingerprint: true 
                 emailext attachLog: false, body: '''$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:
-                 ${ENV,var="GIT_BRANCH"} ${ENV,var="GIT_COMMIT"}''', compressLog: true, replyTo: 'phan.anh.tuan@gmail.com', subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!', to: "tuan.phan@informed.com"
+                ${PROPFILE,file="env.txt",property="GIT_COMMIT"} ${ENV,var="GIT_COMMIT"}''', compressLog: true, replyTo: 'phan.anh.tuan@gmail.com', subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!', to: "tuan.phan@informed.com"
                 error 'pipeline stopped here'
             }
         }
