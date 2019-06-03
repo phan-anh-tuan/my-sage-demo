@@ -8,16 +8,16 @@ pipeline {
     stages {
         stage('Preparation') {
             steps {
-                sh label: '', script: 'sudo apt install python-pip -y &&  sudo pip install awscli --upgrade && aws --version'
+                // sh label: '', script: 'sudo apt install python-pip -y &&  sudo pip install awscli --upgrade && aws --version'
             }
         }
        
         stage('Build') {
             steps {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-                checkout scm
-                echo 'Finished checking out the source code!' 
-                archiveArtifacts artifacts: '**/README.md', fingerprint: true 
+                // checkout scm
+                // echo 'Finished checking out the source code!' 
+                // archiveArtifacts artifacts: '**/README.md', fingerprint: true 
                 emailext attachLog: false, body: '''$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:
                  ${build.url}
                  GIT COMMIT $GIT_REVISION
